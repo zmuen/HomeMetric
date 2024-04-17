@@ -15,6 +15,8 @@ messages = [
         "role": "user",
         "content": ("Can you provide the average violent and property crime rate in 550 Memorial Dr. Cambridge, MA based on FBI Uniform Crime Reporting program over the last decade in the format: (# per 100000 residents). Also check and provide the air quality index (AQI) of 550 Memorial Dr. Cambridge, MA from the EPA AirNow platform compulsorily. Just give me the 3 lines of concise output without any extra words or sentences."),
 
+        #"content": ("Can you provide the average violent and property crime rate in 550 Memorial Dr. Cambridge, MA based on FBI Uniform Crime Reporting program over the last decade in the format: (# per 100000 residents). Also check and provide the air quality index (AQI) of 550 Memorial Dr. Cambridge, MA from the EPA AirNow platform compulsorily, -the reply is useless and huge to be honest")
+
         # "role": "user",
         # "content": (
         #     "Count to 100, with a comma between each number and no newlines. "
@@ -32,9 +34,21 @@ response = client.chat.completions.create(
  )
 print(response)
 
+response2 = client.chat.completions.create(
+     model="sonar-small-chat",
+     messages=messages,
+ )
+print(response2)
+
+response3 = client.chat.completions.create(
+     model="codellama-70b-instruct",
+     messages=messages,
+ )
+print(response3)
+
 #string1 = str(response.choices[0].message.content)
-string1 = str(response.choices[0].message.content)
-print(string1)
+#string1 = str(response.choices[0].message.content)
+#print(string1)
 
 # demo chat completion with streaming
 #response_stream = client.chat.completions.create(
