@@ -1,2 +1,2 @@
 # HomeMetric
-Property Habitability Calculator
+Rental Recommendation and Habitability Calculator
