@@ -13,7 +13,7 @@ messages = [
     {
 
         "role": "user",
-        "content": ("Can you provide the average violent and property crime rate in Dorchester, MA based on FBI Uniform Crime Reporting program over the last decade in the format: (# per 100000 residents). Also check and provide the air quality index (AQI) of Dorchester, MA from the EPA AirNow platform. Just give me the 3 lines of concise output without any extra words or sentences."),
+        "content": ("Can you provide the average violent and property crime rate in 550 Memorial Dr. Cambridge, MA based on FBI Uniform Crime Reporting program over the last decade in the format: (# per 100000 residents). Also check and provide the air quality index (AQI) of 550 Memorial Dr. Cambridge, MA from the EPA AirNow platform compulsorily. Just give me the 3 lines of concise output without any extra words or sentences."),
 
         # "role": "user",
         # "content": (
@@ -31,6 +31,10 @@ response = client.chat.completions.create(
      messages=messages,
  )
 print(response)
+
+#string1 = str(response.choices[0].message.content)
+string1 = str(response.choices[0].message.content)
+print(string1)
 
 # demo chat completion with streaming
 #response_stream = client.chat.completions.create(
