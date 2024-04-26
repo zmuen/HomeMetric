@@ -103,8 +103,8 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="Beds">Beds</label>
-            <select id="Beds">
+            <label for="beds">Beds</label>
+            <select id="beds">
                 <option value="">Select Beds</option>
                 <option value="Any">Any</option>
                 <option value="Studio">Studio</option>
@@ -114,8 +114,8 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="Baths">Baths</label>
-            <select id="Baths">
+            <label for="baths">Baths</label>
+            <select id="baths">
                 <option value="">Select Baths</option>
                 <option value="Any">Any</option>
                 <option value="1+">1+</option>
@@ -123,10 +123,30 @@
                 <option value="3+">3+</option>
             </select>
         </div>
-        <button onclick="fetchProperties()">Search</button>
-        <div id="propertyList">
-            <!-- Properties will be displayed here -->
+        <div class="form-group date-input">
+            <label for="startDate">Start Date</label>
+            <div class="input-group">
+                <input type="date" id="startDate" class="date-picker">
+                <label for="flexibleStartDate" class="checkbox-label">
+                    <input type="checkbox" id="flexibleStartDate" class="checkbox">
+                    Flexible
+                </label>
+            </div>
         </div>
+        <div class="form-group date-input">
+            <label for="endDate">End Date</label>
+            <div class="input-group">
+                <input type="date" id="endDate" class="date-picker">
+                <label for="flexibleEndDate" class="checkbox-label">
+                    <input type="checkbox" id="flexibleEndDate" class="checkbox">
+                    Flexible
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <button onclick="fetchProperties()">Search</button>
+        </div>
+
     </div>
     <div id='map'></div>
 
@@ -145,13 +165,29 @@
             const location = document.getElementById('locationInput').value;
             const priceRange = document.getElementById('priceRange').value;
             const propertyType = document.getElementById('propertyType').value;
-            const area = document.getElementById('areaInput').value;
+            const beds = document.getElementById('beds').value;
+            const baths = document.getElementById('baths').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const flexibleStartDate = document.getElementById('flexibleStartDate').checked;
+            const flexibleEndDate = document.getElementById('flexibleEndDate').checked;
+
             const response = await fetch('/api/recommendations', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ location, priceRange, propertyType, area })
+                body: JSON.stringify({
+                    location,
+                    priceRange,
+                    propertyType,
+                    beds,
+                    baths,
+                    startDate,
+                    endDate,
+                    flexibleStartDate, // Send boolean value of flexible start date
+                    flexibleEndDate // Send boolean value of flexible end date
+                })
             });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -160,6 +196,7 @@
             displayMap(recommendations);
             displayRecommendations(recommendations);
         }
+
 
         function displayMap(properties) {
             if (properties.length > 0) {
@@ -185,7 +222,8 @@
                     <h3>${property.name}</h3>
                     <p>Location: ${property.location}</p>
                     <p>Price: ${property.price}</p>
-                    <p>Area: ${property.area} sqft</p>
+                    <p>Beds: ${property.beds}</p>
+                    <p>Baths: ${property.baths}</p>
                     <p>Habitability Score: ${property.habitabilityScore}</p>
                 `;
                 propertyList.appendChild(element);
