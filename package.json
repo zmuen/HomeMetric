@@ -1,0 +1,18 @@
+{
+    "name": "property-recommendation-service",
+    "version": "1.0.0",
+    "description": "A service to fetch property recommendations using OpenAI and Google Maps APIs.",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "dotenv": "^16.0.0",
+        "express": "^4.17.1",
+        "body-parser": "^1.19.0",
+        "node-fetch": "^2.6.1",
+        "googleapis": "^73.0.0"
+    },
+    "author": "",
+    "license": "ISC"
+}

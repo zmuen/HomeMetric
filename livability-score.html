@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Livability Score</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            background: #87CEEB;
+            color: #fff;
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+        h1,
+        h2,
+        h3 {
+            color: #333;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        section {
+            background: white;
+            margin: 10px 0;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>The Livability Score</h1>
+    </header>
+    <main>
+        <section>
+            <h2>Introduction</h2>
+            <p>The Livability Score is a score out of 100 designed to help people evaluate the quality of an area. It
+                includes 9 categories and data from multiple datasets, ranking over 45,000 locations.</p>
+
+            <p>Each category (amenities, commute, cost of living, crime, employment, health & safety, housing, schools
+                and user ratings) is scored individually based on data in the methodology below. A letter grade is
+                assigned to each category in order to easily evaluate the score.
+            </p>
+            <ul>
+                <li>A+: 83–100 A: 80–82 A-: 77–79</li>
+                <li>B+: 74–76 B: 71–73 B: -68–70</li>
+                <li>C+: 65–67 C: 62–64 C: -59–61</li>
+                <li>D+: 56–58 D: 53–55</li>
+                <li>D-: 50–52 F: 0–49</li>
+                <!-- Add other amenities -->
+            </ul>
+        </section>
+
+        <section>
+            <h2>Categories</h2>
+            <article>
+                <h3>Amenities</h3>
+                <p>TThe amenities score provides an overview of the availability of local amenities in close proximity
+                    to an area. The algorithm searches for all amenities in the categories below within a 2 mile/3km (30
+                    minute walk) radius to the center point of a location. Higher scores are awarded to the areas with
+                    the most nearby amenities from each of the following categories.</p>
+                <ul>
+                    <li>Coffee Shops: 14%</li>
+                    <li>Entertainment: 14%</li>
+                    <!-- Add other amenities -->
+                </ul>
+            </article>
+
+        </section>
+
+        <section>
+            <h2>Sources</h2>
+            <p>The livability score is sourced from AreaVibes, which use data from OpenStreetMap, US Census Bureau, and
+                other authoritative sources to calculate the scores.</p>
+        </section>
+    </main>
+</body>
+
+</html>

@@ -1,5 +1,3 @@
-const { start } = require("repl");
-
 function fetchProperties() {
     const location = document.getElementById('locationInput').value;
     const priceRange = document.getElementById('priceRange').value;
@@ -8,8 +6,6 @@ function fetchProperties() {
     const baths = document.getElementById('baths').value;
     const startDate = document.getElementById('startDate').value;
     const endDate = document.getElementById('endDate').value;
-
-    // Check if the "Flexible" checkboxes are checked
     const flexibleStartDate = document.getElementById('flexibleStartDate').checked;
     const flexibleEndDate = document.getElementById('flexibleEndDate').checked;
 
@@ -20,7 +16,9 @@ function fetchProperties() {
         beds,
         baths,
         startDate,
-        endDate
+        flexibleStartDate,
+        endDate,
+        flexibleEndDate
     };
 
     // Add flexible start and end date options to the request body
