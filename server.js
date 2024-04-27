@@ -11,28 +11,10 @@ const port = 3000;
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
 
-// Function to geocode address using Google Maps Geocoding API
-const geocodeAddress = async (address) => {
-    try {
-        const response = await fetch(
-            `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${process.env.GOOGLE_MAPS_API_KEY}`
-        );
-        const data = await response.json();
-        if (data.status === 'OK' && data.results.length > 0) {
-            const location = data.results[0].geometry.location;
-            return { latitude: location.lat, longitude: location.lng };
-        }
-        return null;
-    } catch (error) {
-        console.error('Error geocoding address:', error);
-        return null;
-    }
-};
-
 // POST route to handle user input and fetch recommendations from OpenAI
 app.post('/api/recommendations', async (req, res) => {
     try {
-        const { location, priceRange, propertyType, beds, baths, startDate, endDate, flexibleStartDate, flexibleEndDate } = req.body;
+        const { location, priceRange, propertyType, beds, baths, startDate, flexibleStartDate, endDate, flexibleEndDate } = req.body;
 
         // Construct the request to OpenAI API
         const requestBody = {
@@ -43,12 +25,19 @@ app.post('/api/recommendations', async (req, res) => {
             Beds: ${beds}
             Baths: ${baths}
             Start Date: ${startDate}
-            End Date: ${endDate}
             Flexible Start Date: ${flexibleStartDate}
+            End Date: ${endDate}
             Flexible End Date: ${flexibleEndDate}
             Output Format:
-            Return each property in the following JSON format:
-            {title: "Title of the property", description: "Description of the property", address: "Address of the property", price: "Price of the property", link: "Link to the property listing"}
+            Each property should be returned in the following JSON format:
+            {
+            "name": "Name of the property",
+            "description": "Description of the property",
+            "neighborhood": "Neighborhood, city, state, zip code",
+            "location": [latitude, longitude],
+            "price": "Price of the property",
+            "link": "Link to the property listing"
+            }
             `,
             max_tokens: 100,
             temperature: 0.5,
@@ -72,14 +61,6 @@ app.post('/api/recommendations', async (req, res) => {
 
         const recommendations = await openAIResponse.json();
 
-        // Geocode addresses from recommendations
-        for (const property of recommendations) {
-            const { address } = property;
-            const { latitude, longitude } = await geocodeAddress(address);
-            property.latitude = latitude;
-            property.longitude = longitude;
-        }
-
         // Send the recommendations back to the client
         res.json(recommendations);
     } catch (error) {
@@ -97,14 +78,14 @@ app.listen(port, () => {
 // Code for obtaining Airbnb coordinates:
 
 // from selenium import webdriver
-// from selenium.webdriver.chrome.options import Options 
+// from selenium.webdriver.chrome.options import Options
 // import time
 // from bs4 import BeautifulSoup
 // import urllib.parse as urlparse
 // from urllib.parse import parse_qs
 
 // def main():
-//     chrome_options = Options()  
+//     chrome_options = Options()
 //     chrome_options.add_argument("--headless")  #if you don't want the GUI to pop up
 //     driver = webdriver.Chrome(options=chrome_options)
 //     driver.get('https://www.airbnb.co.uk/rooms/15307317')

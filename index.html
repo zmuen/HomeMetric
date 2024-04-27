@@ -71,6 +71,33 @@
         button:hover {
             background-color: #4682B4;
         }
+
+        footer {
+            text-align: left;
+            padding: 20px;
+            background-color: #e7e7e7;
+            border-top: 1px solid #ddd;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+        footer a {
+            color: #0056b3;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        marker {
+            background-color: white;
+        }
+
+        .highlighted-marker {
+            background-color: black;
+        }
     </style>
 </head>
 
@@ -147,9 +174,15 @@
             <button onclick="fetchProperties()">Search</button>
         </div>
 
+        <footer>
+            <p>Learn more about our <a href="livability-score.html">Livability Score</a>.</p>
+        </footer>
+
     </div>
     <div id='map'></div>
+    <div id="propertyList"></div>
 
+    <script src="send.js"></script>
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js'></script>
     <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoiYW5uaWV6bWUxMiIsImEiOiJjbHMxNzR0eGIwNjI4MmlvOTRlbDR5cnliIn0.Py0zGq-Mb40HIegPUXznEw';
@@ -161,74 +194,60 @@
             zoom: 12
         });
 
-        async function fetchProperties() {
-            const location = document.getElementById('locationInput').value;
-            const priceRange = document.getElementById('priceRange').value;
-            const propertyType = document.getElementById('propertyType').value;
-            const beds = document.getElementById('beds').value;
-            const baths = document.getElementById('baths').value;
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            const flexibleStartDate = document.getElementById('flexibleStartDate').checked;
-            const flexibleEndDate = document.getElementById('flexibleEndDate').checked;
-
-            const response = await fetch('/api/recommendations', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    location,
-                    priceRange,
-                    propertyType,
-                    beds,
-                    baths,
-                    startDate,
-                    endDate,
-                    flexibleStartDate, // Send boolean value of flexible start date
-                    flexibleEndDate // Send boolean value of flexible end date
-                })
-            });
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const recommendations = await response.json();
-            displayMap(recommendations);
-            displayRecommendations(recommendations);
-        }
-
-
         function displayMap(properties) {
             if (properties.length > 0) {
                 map.flyTo({
-                    center: [properties[0].longitude, properties[0].latitude],
+                    center: [properties[0].location[1], properties[0].location[0]], // [longitude, latitude]
                     essential: true
                 });
 
                 properties.forEach(property => {
-                    new mapboxgl.Marker()
-                        .setLngLat([property.longitude, property.latitude])
+                    const marker = new mapboxgl.Marker()
+                        .setLngLat(property.location)
                         .addTo(map);
+
+                    // Attach click event listener to the marker
+                    marker.getElement().addEventListener('click', () => {
+                        // Highlight the marker (you can customize this)
+                        marker.getElement().classList.add('highlighted-marker');
+
+                        // Remove highlight from other markers
+                        properties.forEach(p => {
+                            if (p !== property) {
+                                // Find marker element and remove highlight
+                                map.getCanvas().querySelectorAll('.mapboxgl-marker').forEach(el => {
+                                    if (el.getAttribute('data-name') === p.name) {
+                                        el.classList.remove('highlighted-marker');
+                                    }
+                                });
+                            }
+                        });
+                    });
                 });
             }
         }
 
+
         function displayRecommendations(properties) {
             const propertyList = document.getElementById('propertyList');
             propertyList.innerHTML = ''; // Clear current list
+
             properties.forEach(property => {
+                const googleSearchURL = `https://www.google.com/search?q=site:${encodeURIComponent(property.link)}+${encodeURIComponent(property.name)}`;
                 const element = document.createElement('div');
+                element.classList.add('property-item');
                 element.innerHTML = `
                     <h3>${property.name}</h3>
-                    <p>Location: ${property.location}</p>
+                    <p>${property.description}</p>
+                    <p>Location: ${property.neighborhood}</p>
                     <p>Price: ${property.price}</p>
-                    <p>Beds: ${property.beds}</p>
-                    <p>Baths: ${property.baths}</p>
-                    <p>Habitability Score: ${property.habitabilityScore}</p>
+                    <a href="${property.link}" target="_blank" class="view-listing-btn">View Listing</a>
+                    
                 `;
                 propertyList.appendChild(element);
             });
         }
+
     </script>
 </body>
 
