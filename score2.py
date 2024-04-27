@@ -1,3 +1,12 @@
+# Try to store the scores in a DB
+
+# Explanation for this document: We are trying to get livability scores (all parameters: amenities, commute, cost of living, crime, employment, health & safety, housing, schools and user ratings) from Area Vibes based on the address input from the user and store them in a database. New requests will be retreived from the Perplexity API and stored in the database. Addresses which have already been searched and exists in the database will be accessed directly without having to make the API call. We will finally store the scores in a SQLite database using the sqlite3 library.
+
+#Steps: 
+# 1) Ping Perplexity to get Area Vibes scores
+# 2) We have the code to retrieve.. or maybe not.. check the format of getting data from the API
+# 3) Create a database and a table to store the scores
+
 import json
 import sqlite3
 from openai import OpenAI
