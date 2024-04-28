@@ -3,12 +3,27 @@ require('dotenv').config(); // Load environment variables if using locally with 
 const express = require('express');
 const fetch = require('node-fetch');
 const bodyParser = require('body-parser');
+const cors = require('cors'); // Import the cors module
+const path = require('path'); // Import the path module
 
 const app = express();
 const port = 5500; // Change the port to 5500
 
+// Middleware to enable CORS
+app.use(cors());
+
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
+
+// Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use((req, res, next) => {
+    if (req.url.endsWith('.js')) {
+        res.type('text/javascript');
+    }
+    next();
+});
 
 // POST route to handle user input and fetch recommendations from OpenAI
 app.post('/api/recommendations', async (req, res) => {
