@@ -183,7 +183,7 @@
     <div id="propertyList"></div>
 
     <script src="send.js"></script>
-    <script src='https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.js'></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
     <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoiYW5uaWV6bWUxMiIsImEiOiJjbHMxNzR0eGIwNjI4MmlvOTRlbDR5cnliIn0.Py0zGq-Mb40HIegPUXznEw';
 
@@ -242,7 +242,6 @@
                     <p>Location: ${property.neighborhood}</p>
                     <p>Price: ${property.price}</p>
                     <a href="${property.link}" target="_blank" class="view-listing-btn">View Listing</a>
-                    
                 `;
                 propertyList.appendChild(element);
             });

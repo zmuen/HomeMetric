@@ -1,4 +1,6 @@
 function fetchProperties() {
+    console.log('Sending request to backend...'); // Log before sending the request
+
     const location = document.getElementById('locationInput').value;
     const priceRange = document.getElementById('priceRange').value;
     const propertyType = document.getElementById('propertyType').value;
@@ -34,14 +36,16 @@ function fetchProperties() {
         body: JSON.stringify(requestBody),
     })
         .then(response => {
+            console.log('Received response from backend:', response); // Log after receiving the response
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
         .then(properties => {
+            console.log('Properties received from backend:', properties); // Log after processing the response
             displayMap(properties);
             displayRecommendations(properties);
         })
-        .catch(error => console.error('Error fetching properties:', error));
+        .catch(error => console.error('Error fetching properties:', error)); // Log any errors
 }

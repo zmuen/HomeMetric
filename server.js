@@ -3,10 +3,9 @@ require('dotenv').config(); // Load environment variables if using locally with 
 const express = require('express');
 const fetch = require('node-fetch');
 const bodyParser = require('body-parser');
-const { google } = require('googleapis');
 
 const app = express();
-const port = 3000;
+const port = 5500; // Change the port to 5500
 
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
@@ -15,6 +14,9 @@ app.use(bodyParser.json());
 app.post('/api/recommendations', async (req, res) => {
     try {
         const { location, priceRange, propertyType, beds, baths, startDate, flexibleStartDate, endDate, flexibleEndDate } = req.body;
+
+        // Retrieve the OpenAI API key from environment variables
+        const apiKey = process.env.OPENAI_API_KEY;
 
         // Construct the request to OpenAI API
         const requestBody = {
@@ -50,7 +52,7 @@ app.post('/api/recommendations', async (req, res) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}` // Access API key from environment variables
+                'Authorization': `Bearer ${apiKey}` // Access API key from environment variables
             },
             body: JSON.stringify(requestBody)
         });
@@ -73,27 +75,3 @@ app.post('/api/recommendations', async (req, res) => {
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
-
-
-// Code for obtaining Airbnb coordinates:
-
-// from selenium import webdriver
-// from selenium.webdriver.chrome.options import Options
-// import time
-// from bs4 import BeautifulSoup
-// import urllib.parse as urlparse
-// from urllib.parse import parse_qs
-
-// def main():
-//     chrome_options = Options()
-//     chrome_options.add_argument("--headless")  #if you don't want the GUI to pop up
-//     driver = webdriver.Chrome(options=chrome_options)
-//     driver.get('https://www.airbnb.co.uk/rooms/15307317')
-//     time.sleep(2)
-//     soup = BeautifulSoup(driver.page_source, "lxml")
-//     url = (soup.find("img", {"data-veloute":"map/GoogleMapStatic"})).attrs['src']
-//     parsed = urlparse.urlparse(url)
-//     print(parse_qs(parsed.query)['center'])
-
-// if __name__ == '__main__':
-//     main()
