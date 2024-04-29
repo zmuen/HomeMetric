@@ -1,13 +1,13 @@
-require('dotenv').config(); // Load environment variables if using locally with dotenv
+require('dotenv').config(); // Load environment variables
 
 const express = require('express');
-const fetch = require('node-fetch');
+const axios = require('axios'); // Replace node-fetch with axios
 const bodyParser = require('body-parser');
-const cors = require('cors'); // Import the cors module
-const path = require('path'); // Import the path module
+const cors = require('cors');
+const path = require('path');
 
 const app = express();
-const port = 5500; // Change the port to 5500
+const port = 5500;
 
 // Middleware to enable CORS
 app.use(cors());
@@ -25,68 +25,61 @@ app.use((req, res, next) => {
     next();
 });
 
-// POST route to handle user input and fetch recommendations from OpenAI
 app.post('/api/recommendations', async (req, res) => {
     try {
+        // Extract user input from the request body
         const { location, priceRange, propertyType, beds, baths, startDate, flexibleStartDate, endDate, flexibleEndDate } = req.body;
 
         // Retrieve the OpenAI API key from environment variables
         const apiKey = process.env.OPENAI_API_KEY;
 
-        // Construct the request to OpenAI API
+        // Construct the request to OpenAI API including a system message and a user message
         const requestBody = {
-            prompt: `Task: Search for properties based on the following preferences.
-            Location: ${location}
-            Price Range: ${priceRange}
-            Property Type: ${propertyType}
-            Beds: ${beds}
-            Baths: ${baths}
-            Start Date: ${startDate}
-            Flexible Start Date: ${flexibleStartDate}
-            End Date: ${endDate}
-            Flexible End Date: ${flexibleEndDate}
-            Output Format:
-            Each property should be returned in the following JSON format:
-            {
-            "name": "Name of the property",
-            "description": "Description of the property",
-            "neighborhood": "Neighborhood, city, state, zip code",
-            "location": [latitude, longitude],
-            "price": "Price of the property",
-            "link": "Link to the property listing"
-            }
-            `,
-            max_tokens: 100,
-            temperature: 0.5,
-            top_p: 1,
-            n: 20 // Number of recommendations
+            model: 'gpt-3.5-turbo',
+            messages: [
+                {
+                    role: 'system',
+                    content: 'Task: Search for 5 properties based on the following preferences. Each property should be returned in the following JSON format: {"name": "Name of the property", "description": "Description of the property", "neighborhood": "Neighborhood, city, state, zip code", "location": [latitude, longitude], "price": "Price of the property", "link": "url to the property listing"}'
+                },
+                {
+                    role: 'user',
+                    content: `Location: ${location}
+                    Price Range: ${priceRange}
+                    Property Type: ${propertyType}
+                    Beds: ${beds}
+                    Baths: ${baths}
+                    Start Date: ${startDate}
+                    Flexible Start Date: ${flexibleStartDate}
+                    End Date: ${endDate}
+                    Flexible End Date: ${flexibleEndDate}`
+                }
+            ]
         };
 
-        // Make a POST request to the OpenAI API
-        const openAIResponse = await fetch('https://api.openai.com/v1/completions', {
-            method: 'POST',
+        const openAIResponse = await axios.post('https://api.openai.com/v1/chat/completions', requestBody, {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}` // Access API key from environment variables
-            },
-            body: JSON.stringify(requestBody)
+                'Authorization': `Bearer ${apiKey}`
+            }
         });
 
-        if (!openAIResponse.ok) {
+        if (openAIResponse.status !== 200) {
             throw new Error(`OpenAI API error! status: ${openAIResponse.status}`);
         }
 
-        const recommendations = await openAIResponse.json();
+        // Parse the response from OpenAI API
+        const recommendedProperties = JSON.parse(openAIResponse.data.choices[0].message.content);
 
-        // Send the recommendations back to the client
-        res.json(recommendations);
-    } catch (error) {
+        console.log(recommendedProperties);
+
+        // Send the correct array of objects back to the client
+        res.json(recommendedProperties);
+    } catch (error) { // Close try block correctly
         console.error('Error fetching recommendations:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-// Start the server
 app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+    console.log(`Server running on port ${port}`);
 });

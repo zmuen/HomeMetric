@@ -35,17 +35,17 @@ function fetchProperties() {
         },
         body: JSON.stringify(requestBody),
     })
-        .then(response => {
-            console.log('Received response from backend:', response); // Log after receiving the response
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(properties => {
-            console.log('Properties received from backend:', properties); // Log after processing the response
-            displayMap(properties);
-            displayRecommendations(properties);
-        })
-        .catch(error => console.error('Error fetching properties:', error)); // Log any errors
+    .then(response => {
+        console.log('Received response from backend:', response); // Log after receiving the response
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(properties => {
+        console.log('Properties received from backend:', properties); // Log the actual data
+        displayMap([properties]); // Make sure to wrap it in an array if needed
+        displayRecommendations([properties]); // Make sure to wrap it in an array if needed
+    })
+    .catch(error => console.error('Error fetching properties:', error)); // Log any errors    
 }

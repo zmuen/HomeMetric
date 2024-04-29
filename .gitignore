@@ -1,2 +1,8 @@
 # Dependency directories
 node_modules/
+
+# Environment file
+.env
+
+# Build directory
+settings.json

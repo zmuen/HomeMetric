@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <title>HomeMetric</title>
+    <link rel="icon" href="/favicon.ico">
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css' rel='stylesheet' />
     <style>
         body {
@@ -13,22 +13,41 @@
             background-color: #f4f4f4;
             display: flex;
             height: 100vh;
-            /* Full viewport height */
         }
 
         .container {
-            width: 40%;
-            /* Adjusted for side-by-side layout */
+            width: 30%;
             padding: 20px;
             overflow-y: auto;
-            /* Adds scroll to the form if needed */
         }
 
         #map {
-            width: 60%;
-            /* Adjusted for side-by-side layout */
+            width: 70%; /* Now 70% for the initial view */
+            height: 100vh; /* Full viewport height */
+            float: right; /* Float to the right */
+        }
+
+        .property-list {
+            width: 0; /* Initial width is zero, so it's not visible */
             height: 100vh;
-            /* Full viewport height */
+            overflow-y: auto;
+            position: absolute;
+            top: 0;
+            right: 0;
+            transition: width 0.5s; /* Smooth transition for resizing */
+            background: #fff; /* Optional: for better visibility */
+        }
+
+        /* Add more CSS here for .property-card and other classes as needed */
+
+        /* Rest of your CSS... */
+        
+        /* You might want to add CSS for .property-card similar to this */
+        .property-card {
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background-color: #fff;
         }
 
         .form-group {
@@ -72,11 +91,11 @@
             background-color: #4682B4;
         }
 
+        /* Footer CSS */
         footer {
-            text-align: left;
-            padding: 20px;
-            background-color: #e7e7e7;
-            border-top: 1px solid #ddd;
+            position: absolute;
+            bottom: 0;
+            width: 30%; /* Match the width of the container */
         }
 
         footer p {
@@ -100,16 +119,14 @@
         }
     </style>
 </head>
-
 <body>
     <div class="container">
-        <h1>HomeMetric</h1>
         <div class="form-group">
             <label for="locationInput">Location</label>
             <input type="text" id="locationInput" placeholder="Enter location">
         </div>
         <div class="form-group">
-            <label for="priceRange">Price Range</label>
+            <label for="priceRange in USD">Price Range</label>
             <select id="priceRange">
                 <option value="">Select Price Range</option>
                 <option value="0-1000">$0 - $1000</option>
@@ -177,12 +194,12 @@
         <footer>
             <p>Learn more about our <a href="livability-score.html">Livability Score</a>.</p>
         </footer>
-
     </div>
     <div id='map'></div>
-    <div id="propertyList"></div>
+    <div id="propertyList" class="property-list">
+        <!-- Property cards will be appended here -->
+    </div>
 
-    <script src="send.js"></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
     <script>
         mapboxgl.accessToken = 'pk.eyJ1IjoiYW5uaWV6bWUxMiIsImEiOiJjbHMxNzR0eGIwNjI4MmlvOTRlbDR5cnliIn0.Py0zGq-Mb40HIegPUXznEw';
@@ -228,26 +245,40 @@
         }
 
 
+        // Function to display recommendations
+        function adjustLayoutForPropertyList() {
+            // Update the width of the map and the property list
+            document.getElementById('map').style.width = '60%';
+            document.getElementById('propertyList').style.width = '30%'; // Now visible
+        }
+
         function displayRecommendations(properties) {
             const propertyList = document.getElementById('propertyList');
             propertyList.innerHTML = ''; // Clear current list
 
             properties.forEach(property => {
-                const googleSearchURL = `https://www.google.com/search?q=site:${encodeURIComponent(property.link)}+${encodeURIComponent(property.name)}`;
-                const element = document.createElement('div');
-                element.classList.add('property-item');
-                element.innerHTML = `
-                    <h3>${property.name}</h3>
-                    <p>${property.description}</p>
-                    <p>Location: ${property.neighborhood}</p>
-                    <p>Price: ${property.price}</p>
-                    <a href="${property.link}" target="_blank" class="view-listing-btn">View Listing</a>
+                const card = document.createElement('div');
+                card.classList.add('property-card');
+
+                card.innerHTML = `
+                    <div class="property-details">
+                        <h3>${property.name}</h3>
+                        <p>${property.description}</p>
+                        <p>Location: ${property.neighborhood}</p>
+                        <p>Price in USD: ${property.price}</p>
+                    </div>
+                    <div class="property-actions">
+                        <a href="${property.link}" target="_blank" class="view-listing-btn">View Listing</a>
+                    </div>
                 `;
-                propertyList.appendChild(element);
+                propertyList.appendChild(card);
             });
+            adjustLayoutForPropertyList(); // Adjust the layout after the properties are displayed
         }
 
-    </script>
-</body>
 
+    </script>
+
+    <script src="send.js"></script>
+</body>
 </html>
