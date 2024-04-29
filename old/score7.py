@@ -1,5 +1,3 @@
-# Example script to get the livability scores for a neighbourhood from Area Vibes using OpenAI API and update the SQLite3 database
-
 import json
 import sqlite3
 from openai import OpenAI

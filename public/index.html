@@ -5,119 +5,7 @@
     <title>HomeMetric</title>
     <link rel="icon" href="/favicon.ico">
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.3.1/mapbox-gl.css' rel='stylesheet' />
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            display: flex;
-            height: 100vh;
-        }
-
-        .container {
-            width: 30%;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        #map {
-            width: 70%; /* Now 70% for the initial view */
-            height: 100vh; /* Full viewport height */
-            float: right; /* Float to the right */
-        }
-
-        .property-list {
-            width: 0; /* Initial width is zero, so it's not visible */
-            height: 100vh;
-            overflow-y: auto;
-            position: absolute;
-            top: 0;
-            right: 0;
-            transition: width 0.5s; /* Smooth transition for resizing */
-            background: #fff; /* Optional: for better visibility */
-        }
-
-        /* Add more CSS here for .property-card and other classes as needed */
-
-        /* Rest of your CSS... */
-        
-        /* You might want to add CSS for .property-card similar to this */
-        .property-card {
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            padding: 10px;
-            background-color: #fff;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            align-items: left;
-            /* Centers the children (label, input, select) */
-            margin-bottom: 15px;
-        }
-
-        label {
-            margin-bottom: 5px;
-            width: 100%;
-            /* Ensures label takes full width of form-group */
-            text-align: left;
-            /* Aligns the label text to the left */
-        }
-
-        input[type="text"],
-        input[type="number"],
-        select,
-        button {
-            width: calc(80% - 16px);
-            /* Adjusts width and accounts for padding */
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-
-        button {
-            padding: 10px;
-            background-color: #87CEEB;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #4682B4;
-        }
-
-        /* Footer CSS */
-        footer {
-            position: absolute;
-            bottom: 0;
-            width: 30%; /* Match the width of the container */
-        }
-
-        footer p {
-            margin: 0;
-        }
-
-        footer a {
-            color: #0056b3;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        marker {
-            background-color: white;
-        }
-
-        .highlighted-marker {
-            background-color: black;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
@@ -197,7 +85,6 @@
     </div>
     <div id='map'></div>
     <div id="propertyList" class="property-list">
-        <!-- Property cards will be appended here -->
     </div>
 
     <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
@@ -214,7 +101,7 @@
         function displayMap(properties) {
             if (properties.length > 0) {
                 map.flyTo({
-                    center: [properties[0].location[1], properties[0].location[0]], // [longitude, latitude]
+                    center: properties[0].location, // [longitude, latitude]
                     essential: true
                 });
 
@@ -222,23 +109,17 @@
                     const marker = new mapboxgl.Marker()
                         .setLngLat(property.location)
                         .addTo(map);
+                    
+                    marker.getElement().setAttribute('data-property-id', index);  // Assign ID to marker
 
                     // Attach click event listener to the marker
                     marker.getElement().addEventListener('click', () => {
-                        // Highlight the marker (you can customize this)
-                        marker.getElement().classList.add('highlighted-marker');
-
-                        // Remove highlight from other markers
-                        properties.forEach(p => {
-                            if (p !== property) {
-                                // Find marker element and remove highlight
-                                map.getCanvas().querySelectorAll('.mapboxgl-marker').forEach(el => {
-                                    if (el.getAttribute('data-name') === p.name) {
-                                        el.classList.remove('highlighted-marker');
-                                    }
-                                });
-                            }
+                        map.flyTo({
+                            center: property.location, // [longitude, latitude]
+                            essential: true,
+                            zoom: 15 // Zoom in for better visibility
                         });
+                        highlightMarker(index);
                     });
                 });
             }
@@ -261,21 +142,59 @@
                 card.classList.add('property-card');
 
                 card.innerHTML = `
-                    <div class="property-details">
-                        <h3>${property.name}</h3>
-                        <p>${property.description}</p>
-                        <p>Location: ${property.neighborhood}</p>
-                        <p>Price in USD: ${property.price}</p>
-                    </div>
-                    <div class="property-actions">
-                        <a href="${property.link}" target="_blank" class="view-listing-btn">View Listing</a>
+                    <div class="flip-card-inner">
+                        <div class="flip-card-front">
+                            <div class="property-info">
+                            <h3>${property.name}</h3>
+                            <p>${property.description}</p>
+                            <p>Location: ${property.neighborhood}</p>
+                            <p>Price in USD: ${property.price}</p>
+                            <p><strong>Overall Livability: ${property.overall_livability}</strong></p></p>
+                            <div class="property-actions">
+                                <a href="${property.link}" target="_blank" class="view-listing-btn">View Listing</a>
+                            </div>
+                        </div>
+                        <div class="flip-card-back">
+                            <h3>Details:</h3>
+                            <p>Amenities: ${property.amenities}</p>
+                            <p>Commute: ${property.commute}</p>
+                            <p>Cost of Living: ${property.cost_of_living}</p>
+                            <p>Crime: ${property.crime}</p>
+                            <p>Employment: ${property.employment}</p>
+                            <p>Health & Safety: ${property.health_safety}</p>
+                            <p>Housing: ${property.housing}</p>
+                            <p>Schools: ${property.schools}</p>
+                            <p>User Ratings: ${property.user_ratings}</p>
+                        </div>
                     </div>
                 `;
+                card.addEventListener('click', function() {
+                    highlightMarker(index);
+                });
+
                 propertyList.appendChild(card);
             });
             adjustLayoutForPropertyList(); // Adjust the layout after the properties are displayed
         }
 
+        document.querySelectorAll('.flip-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.querySelector('.flip-card-inner').classList.toggle('is-flipped');
+            });
+        });
+
+        function highlightMarker(index) {
+            // Remove highlighting from all markers
+            document.querySelectorAll('.mapboxgl-marker').forEach(marker => {
+                marker.classList.remove('highlighted-marker');
+            });
+
+            // Highlight the selected marker
+            const markerToHighlight = document.querySelector(`.mapboxgl-marker[data-property-id="${index}"]`);
+            if (markerToHighlight) {
+                markerToHighlight.classList.add('highlighted-marker');
+            }
+        }
 
     </script>
 
