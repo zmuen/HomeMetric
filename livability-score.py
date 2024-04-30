@@ -3,9 +3,10 @@ import json
 import sqlite3
 from openai import OpenAI
 
-YOUR_API_KEY = "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"
+from config import YOUR_API_KEY
+#YOUR_API_KEY = "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"
 
-neighbourhood = "Back Bay, Boston, MA, 02116"
+neighbourhood = "Cambridgeport, Cambridge, MA, 02139"
 
 messages = [
     {
