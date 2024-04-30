@@ -99,92 +99,150 @@
         });
 
         function displayMap(properties) {
-            if (properties.length > 0) {
+            if (Array.isArray(properties) && properties.length > 0) {
+                // Example of flying to the first property's location
                 map.flyTo({
-                    center: properties[0].location, // [longitude, latitude]
-                    essential: true
+                    center: properties[0].location, // Ensure this is [longitude, latitude]
+                    essential: true,
+                    zoom: 15
                 });
 
-                properties.forEach(property => {
-                    const marker = new mapboxgl.Marker()
-                        .setLngLat(property.location)
-                        .addTo(map);
-                    
-                    marker.getElement().setAttribute('data-property-id', index);  // Assign ID to marker
+                properties.forEach((property, index) => {
+                    if (property && Array.isArray(property.location) && property.location.length === 2) {
+                        const marker = new mapboxgl.Marker()
+                            .setLngLat(property.location)
+                            .addTo(map);
 
-                    // Attach click event listener to the marker
-                    marker.getElement().addEventListener('click', () => {
-                        map.flyTo({
-                            center: property.location, // [longitude, latitude]
-                            essential: true,
-                            zoom: 15 // Zoom in for better visibility
+                        marker.getElement().dataset.propertyId = index.toString(); // Ensure we have an index
+
+                        // Click event listener for the marker
+                        marker.getElement().addEventListener('click', () => {
+                            map.flyTo({
+                                center: property.location,
+                                essential: true,
+                                zoom: 15
+                            });
+                            highlightMarker(index);
                         });
-                        highlightMarker(index);
-                    });
+                    } else {
+                        console.error('Invalid location data for property:', property);
+                    }
                 });
+            } else {
+                console.error('No properties or invalid properties array:', properties);
             }
         }
 
-
-        // Function to display recommendations
-        function adjustLayoutForPropertyList() {
-            // Update the width of the map and the property list
-            document.getElementById('map').style.width = '60%';
-            document.getElementById('propertyList').style.width = '30%'; // Now visible
+        // Send a request to the backend to fetch the livability scores
+        function fetchLivabilityScores(neighbourhood) {
+            return fetch('/get-livability', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ neighbourhood: neighbourhood })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch livability scores');
+                }
+                return response.json();
+            })
+            .catch(error => {
+                console.error('Error fetching livability scores:', error);
+                return {}; // Return empty object on error
+            });
         }
 
+        // Send a request to the backend to fetch the properties
         function displayRecommendations(properties) {
             const propertyList = document.getElementById('propertyList');
             propertyList.innerHTML = ''; // Clear current list
 
-            properties.forEach(property => {
+            properties.forEach((property, index) => {
                 const card = document.createElement('div');
                 card.classList.add('property-card');
-
+                card.dataset.propertyId = index.toString(); // Properly set data attributes
+                
                 card.innerHTML = `
                     <div class="flip-card-inner">
                         <div class="flip-card-front">
                             <div class="property-info">
-                            <h3>${property.name}</h3>
-                            <p>${property.description}</p>
-                            <p>Location: ${property.neighborhood}</p>
-                            <p>Price in USD: ${property.price}</p>
-                            <p><strong>Overall Livability: ${property.overall_livability}</strong></p></p>
+                                <h3>${property.name}</h3>
+                                <p>${property.description}</p>
+                                <p>Location: ${property.neighborhood}</p>
+                                <p>Price in USD: ${property.price}</p>
+                                <p><strong>Overall Livability: ${property.livability.overall_livability}</strong></p>
+                                <!-- Include livability scores here -->
+                                <p>Amenities: ${property.livability.amenities}</p>
+                                <p>Commute: ${property.livability.commute}</p>
+                                <p>Cost of Living: ${property.livability.cost_of_living}</p>
+                                <p>Crime: ${property.livability.crime}</p>
+                                <p>Employment: ${property.livability.employment}</p>
+                                <p>Health & Safety: ${property.livability.health_safety}</p>
+                                <p>Housing: ${property.livability.housing}</p>
+                                <p>Schools: ${property.livability.schools}</p>
+                                <p>User Ratings: ${property.livability.user_ratings}</p>
+                            </div>
                             <div class="property-actions">
                                 <a href="${property.link}" target="_blank" class="view-listing-btn">View Listing</a>
                             </div>
                         </div>
-                        <div class="flip-card-back">
-                            <h3>Details:</h3>
-                            <p>Amenities: ${property.amenities}</p>
-                            <p>Commute: ${property.commute}</p>
-                            <p>Cost of Living: ${property.cost_of_living}</p>
-                            <p>Crime: ${property.crime}</p>
-                            <p>Employment: ${property.employment}</p>
-                            <p>Health & Safety: ${property.health_safety}</p>
-                            <p>Housing: ${property.housing}</p>
-                            <p>Schools: ${property.schools}</p>
-                            <p>User Ratings: ${property.user_ratings}</p>
-                        </div>
                     </div>
                 `;
-                card.addEventListener('click', function() {
+                propertyList.appendChild(card);
+
+                // Add marker to the map
+                const marker = new mapboxgl.Marker()
+                    .setLngLat(property.location)
+                    .addTo(map);
+
+                // Click event listener for the marker
+                marker.getElement().addEventListener('click', () => {
+                    map.flyTo({
+                        center: property.location,
+                        essential: true,
+                        zoom: 15
+                    });
                     highlightMarker(index);
                 });
 
-                propertyList.appendChild(card);
+                // Add hover event listener to flip the card
+                card.addEventListener('mouseenter', function() {
+                    this.querySelector('.flip-card-inner').classList.add('is-flipped');
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.querySelector('.flip-card-inner').classList.remove('is-flipped');
+                });
+
+                // Existing click event listener to highlight the marker when the card is clicked
+                card.addEventListener('click', function() {
+                    highlightMarker(index);
+                });
             });
-            adjustLayoutForPropertyList(); // Adjust the layout after the properties are displayed
+
+            adjustLayoutForPropertyList(); // Adjust layout after all cards are added
+
+            if (propertyList.children.length === 0) {
+                console.log('No properties to display');
+            } else {
+                console.log('Displayed properties successfully');
+            }
         }
 
-        document.querySelectorAll('.flip-card').forEach(card => {
-            card.addEventListener('click', function() {
-                this.querySelector('.flip-card-inner').classList.toggle('is-flipped');
-            });
-        });
+        function adjustLayoutForPropertyList() {
+            const propertyList = document.getElementById('propertyList');
+            if (propertyList.children.length > 0) { // If there are property cards
+                document.getElementById('map').style.width = '75%';
+                propertyList.style.width = '25%';
+            } else { // If there are no property cards
+                document.getElementById('map').style.width = '100%';
+                propertyList.style.width = '0';
+            }
+        }
 
         function highlightMarker(index) {
-            // Remove highlighting from all markers
+            // Clear previous highlights
             document.querySelectorAll('.mapboxgl-marker').forEach(marker => {
                 marker.classList.remove('highlighted-marker');
             });
@@ -195,6 +253,7 @@
                 markerToHighlight.classList.add('highlighted-marker');
             }
         }
+
 
     </script>
 

@@ -27,14 +27,18 @@ body {
     top: 0;
     right: 0;
     transition: width 0.5s; /* Smooth transition for resizing */
-    background: #fff; /* Optional: for better visibility */
+    background: #fff; 
+    box-sizing: border-box;
+    z-index: 10;
 }
 
 .property-card {
     margin-bottom: 10px;
-    border: 1px solid #ddd;
-    padding: 10px;
+    border: 1px solid #fff;
     background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 10px;
+    text-align: left; /* Aligns all text to the left */
 }
 
 .form-group {
@@ -111,6 +115,8 @@ marker {
     perspective: 1000px;
 }
 
+/* Other styles remain unchanged */
+
 .flip-card-inner {
     position: relative;
     width: 100%;
@@ -121,25 +127,40 @@ marker {
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
 }
 
-.flip-card:hover .flip-card-inner {
-    transform: rotateY(180deg);
-}
-
 .flip-card-front, .flip-card-back {
-    position: absolute;
+    /* position: absolute; Removed this line */
     width: 100%;
     height: 100%;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
+    text-align: left; /* Align text to the left */
 }
 
 .flip-card-front {
     background-color: #bbb;
     color: black;
+    z-index: 2; /* Ensures that the front side is above the back side when not flipped */
 }
 
 .flip-card-back {
     background-color: #2980b9;
     color: white;
     transform: rotateY(180deg);
+    z-index: 1; /* Lower z-index so it's below the front side */
+}
+
+.property-card {
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    background-color: #fff;
+    text-align: left; /* Align all text inside property card to the left */
+}
+
+.property-info, .property-actions {
+    text-align: left; /* Ensures text within these divs is also aligned left */
+}
+
+.flip-card-front, .flip-card-back {
+    text-align: left; /* Ensures text in both front and back of the flip card is aligned left */
 }

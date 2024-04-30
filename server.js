@@ -2,7 +2,6 @@ require('dotenv').config(); // Load environment variables
 
 const express = require('express');
 const axios = require('axios'); // Replace node-fetch with axios
-const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 
@@ -14,8 +13,6 @@ const port = 5500;
 // Middleware to enable CORS
 app.use(cors());
 
-// Middleware to parse JSON bodies
-app.use(bodyParser.json());
 app.use(express.json());
 
 // Serve static files from the "public" directory
@@ -42,7 +39,7 @@ app.post('/api/recommendations', async (req, res) => {
             messages: [
                 {
                     role: 'system',
-                    content: 'Task: Generate a detailed list of 4 properties from Airbnb, Zumper or other real estate platforms in JSON format based on the user preferences. Return the information in the following JSON format: {"name": "Name of the property", "description": "Description of the property", "neighborhood": "Neighborhood, city, state, zip code", "location": [longitude, latitude], "price": "Price of the property", "link": "url to the property listing"}'
+                    content: 'Task: Generate a detailed list of 4 properties from Airbnb, Zumper or other rental platforms in valid JSON array format based on the user preferences. Return the information in the following JSON format: {"name": "Name of the property", "description": "Description of the property", "neighborhood": "Neighborhood, city, state, zip code", "location": [longitude, latitude], "price": "Price of the property", "link": "url to the property listing"}'
                 },
                 {
                     role: 'user',
@@ -70,12 +67,10 @@ app.post('/api/recommendations', async (req, res) => {
             throw new Error(`OpenAI API error! status: ${openAIResponse.status}`);
         }
 
-        // Parse the JSON string into an object
-        const recommendedProperties = JSON.parse(openAIResponse.data.choices[0].message.content);
+        // Directly use the data from the response without parsing as JSON string
+        let recommendedProperties = openAIResponse.data.choices[0].message.content;
+        recommendedProperties = JSON.parse(recommendedProperties); // This should be 'let' if it's reassigned
 
-        console.log(recommendedProperties);
-
-        // Send the correctly formatted object back to the client
         res.json(recommendedProperties);
     } catch (error) {
         console.error('Error fetching recommendations:', error);
