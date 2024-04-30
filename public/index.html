@@ -98,31 +98,39 @@
             zoom: 12
         });
 
+        // Declare an array to store references to markers
+        let markers = [];
+
         function displayMap(properties) {
+            // Remove previous markers from the map and the array
+            markers.forEach(marker => {
+                marker.remove(); // Remove each marker from the map
+            });
+
+            markers = []; // Clear the array
+
             if (Array.isArray(properties) && properties.length > 0) {
-                // Example of flying to the first property's location
+                // Fly to the first property's location
                 map.flyTo({
-                    center: properties[0].location, // Ensure this is [longitude, latitude]
+                    center: properties[0].location,
                     essential: true,
                     zoom: 15
                 });
 
                 properties.forEach((property, index) => {
                     if (property && Array.isArray(property.location) && property.location.length === 2) {
-                        const marker = new mapboxgl.Marker()
+                        const marker = new mapboxgl.Marker({ color: '#87CEEB' }) // Set marker color here
                             .setLngLat(property.location)
                             .addTo(map);
 
-                        marker.getElement().dataset.propertyId = index.toString(); // Ensure we have an index
+                        markers.push(marker); // Add marker reference to the array
 
-                        // Click event listener for the marker
+                        marker.getElement().dataset.propertyId = index.toString();
                         marker.getElement().addEventListener('click', () => {
-                            map.flyTo({
-                                center: property.location,
-                                essential: true,
-                                zoom: 15
-                            });
-                            highlightMarker(index);
+                            focusOnProperty(index, properties);
+                        });
+                        marker.getElement().addEventListener('click', () => {
+                            focusOnProperty(index);
                         });
                     } else {
                         console.error('Invalid location data for property:', property);
@@ -130,6 +138,31 @@
                 });
             } else {
                 console.error('No properties or invalid properties array:', properties);
+            }
+        }
+
+        function focusOnProperty(index, properties) {
+            const property = properties[index];
+            if (property) {
+                map.flyTo({
+                    center: property.location,
+                    essential: true,
+                    zoom: 15
+                });
+                highlightMarker(index);
+            }
+        }
+
+        function highlightMarker(index) {
+            // Clear previous highlights
+            markers.forEach(marker => {
+                marker.getElement().style.color = '#87CEEB'; // Reset color for all markers
+            });
+
+            // Highlight the selected marker
+            const markerToHighlight = markers[index];
+            if (markerToHighlight) {
+                markerToHighlight.getElement().style.color = '#4682B4'; // Set color for the highlighted marker
             }
         }
 
@@ -164,6 +197,7 @@
                 card.classList.add('property-card');
                 card.dataset.propertyId = index.toString(); // Properly set data attributes
                 
+                // Didn't manage to get the flip card to work, so moved all the info to the front
                 card.innerHTML = `
                     <div class="flip-card-inner">
                         <div class="flip-card-front">
@@ -193,32 +227,37 @@
                 propertyList.appendChild(card);
 
                 // Add marker to the map
-                const marker = new mapboxgl.Marker()
+                const marker = new mapboxgl.Marker({ color: '#87CEEB' })
                     .setLngLat(property.location)
                     .addTo(map);
 
                 // Click event listener for the marker
                 marker.getElement().addEventListener('click', () => {
                     map.flyTo({
-                        center: property.location,
+                        center: properties[0].location,
                         essential: true,
                         zoom: 15
                     });
                     highlightMarker(index);
                 });
-
-                // Add hover event listener to flip the card
-                card.addEventListener('mouseenter', function() {
-                    this.querySelector('.flip-card-inner').classList.add('is-flipped');
-                });
-                card.addEventListener('mouseleave', function() {
-                    this.querySelector('.flip-card-inner').classList.remove('is-flipped');
-                });
+                
+                // // Add hover event listener to flip the card
+                // card.addEventListener('mouseenter', function() {
+                //     this.querySelector('.flip-card-inner').classList.add('is-flipped');
+                // });
+                // card.addEventListener('mouseleave', function() {
+                //     this.querySelector('.flip-card-inner').classList.remove('is-flipped');
+                // });
 
                 // Existing click event listener to highlight the marker when the card is clicked
                 card.addEventListener('click', function() {
                     highlightMarker(index);
                 });
+                // Add click event listener to focus on the property when the card is clicked
+                card.addEventListener('click', () => {
+                    focusOnProperty(index, properties);
+                });
+
             });
 
             adjustLayoutForPropertyList(); // Adjust layout after all cards are added
@@ -232,7 +271,7 @@
 
         function adjustLayoutForPropertyList() {
             const propertyList = document.getElementById('propertyList');
-            if (propertyList.children.length > 0) { // If there are property cards
+            if (propertyList.children.length > 0) {
                 document.getElementById('map').style.width = '75%';
                 propertyList.style.width = '25%';
             } else { // If there are no property cards
@@ -240,20 +279,6 @@
                 propertyList.style.width = '0';
             }
         }
-
-        function highlightMarker(index) {
-            // Clear previous highlights
-            document.querySelectorAll('.mapboxgl-marker').forEach(marker => {
-                marker.classList.remove('highlighted-marker');
-            });
-
-            // Highlight the selected marker
-            const markerToHighlight = document.querySelector(`.mapboxgl-marker[data-property-id="${index}"]`);
-            if (markerToHighlight) {
-                markerToHighlight.classList.add('highlighted-marker');
-            }
-        }
-
 
     </script>
 

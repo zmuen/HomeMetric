@@ -100,22 +100,12 @@ footer a:hover {
     text-decoration: underline;
 }
 
-marker {
-    background-color: white;
-}
-
-.highlighted-marker {
-    background-color: #4682B4;
-    transform: scale(1.5);
-}
 .flip-card {
     background-color: transparent;
     width: 100%;
     height: 100%;
     perspective: 1000px;
 }
-
-/* Other styles remain unchanged */
 
 .flip-card-inner {
     position: relative;
@@ -128,7 +118,6 @@ marker {
 }
 
 .flip-card-front, .flip-card-back {
-    /* position: absolute; Removed this line */
     width: 100%;
     height: 100%;
     -webkit-backface-visibility: hidden;
@@ -137,7 +126,7 @@ marker {
 }
 
 .flip-card-front {
-    background-color: #bbb;
+    background-color: white;
     color: black;
     z-index: 2; /* Ensures that the front side is above the back side when not flipped */
 }

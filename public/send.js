@@ -54,6 +54,7 @@ function fetchProperties() {
                     }));
                     console.log('Properties with livability scores:', propertiesWithScores);
                     displayRecommendations(propertiesWithScores);
+                    displayMap(propertiesWithScores); // Call displayMap with properties array
                 });
         } else {
             console.error('Received data is not an array:', properties);
