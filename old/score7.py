@@ -1,13 +1,10 @@
-# Example script to get the livability scores for a neighbourhood from Area Vibes using OpenAI API and update the SQLite3 database
-
 import json
 import sqlite3
 from openai import OpenAI
 
-from config import YOUR_API_KEY
-#YOUR_API_KEY = "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"
+YOUR_API_KEY = "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"
 
-neighbourhood = "Boston, Cambridge, MA, 02139"
+neighbourhood = "Cambridgeport, Cambridge, MA, 02139"
 
 messages = [
     {

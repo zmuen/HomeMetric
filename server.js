@@ -6,6 +6,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 
+const { getLivability } = require('./livability');
+
 const app = express();
 const port = 5500;
 
@@ -14,6 +16,7 @@ app.use(cors());
 
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
+app.use(express.json());
 
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -39,7 +42,7 @@ app.post('/api/recommendations', async (req, res) => {
             messages: [
                 {
                     role: 'system',
-                    content: 'Task: Search for 5 properties based on the following preferences. Each property should be returned in the following JSON format: {"name": "Name of the property", "description": "Description of the property", "neighborhood": "Neighborhood, city, state, zip code", "location": [latitude, longitude], "price": "Price of the property", "link": "url to the property listing"}'
+                    content: 'Task: Generate a detailed list of 4 properties from Airbnb, Zumper or other real estate platforms in JSON format based on the user preferences. Return the information in the following JSON format: {"name": "Name of the property", "description": "Description of the property", "neighborhood": "Neighborhood, city, state, zip code", "location": [longitude, latitude], "price": "Price of the property", "link": "url to the property listing"}'
                 },
                 {
                     role: 'user',
@@ -67,19 +70,21 @@ app.post('/api/recommendations', async (req, res) => {
             throw new Error(`OpenAI API error! status: ${openAIResponse.status}`);
         }
 
-        // Parse the response from OpenAI API
+        // Parse the JSON string into an object
         const recommendedProperties = JSON.parse(openAIResponse.data.choices[0].message.content);
 
         console.log(recommendedProperties);
 
-        // Send the correct array of objects back to the client
+        // Send the correctly formatted object back to the client
         res.json(recommendedProperties);
-    } catch (error) { // Close try block correctly
+    } catch (error) {
         console.error('Error fetching recommendations:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: 'Internal server error', message: error.message });
     }
 });
 
+app.post('/get-livability', getLivability);
+
 app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+    console.log(`Server running on http://localhost:${port}`);
 });

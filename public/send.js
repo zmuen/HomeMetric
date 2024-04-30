@@ -35,17 +35,34 @@ function fetchProperties() {
         },
         body: JSON.stringify(requestBody),
     })
-    .then(response => {
-        console.log('Received response from backend:', response); // Log after receiving the response
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+    .then(response => response.json())
+    .then(data => {
+        console.log('Properties received from backend:', data); // Log the actual data
+        if (Array.isArray(data)) {
+            // If the backend sends an array, use it as-is.
+            displayMap(data);
+            displayRecommendations(data);
+        } else {
+            // If the backend sends a single object, create an array with that object.
+            displayMap([data]);
+            displayRecommendations([data]);
         }
-        return response.json();
     })
-    .then(properties => {
-        console.log('Properties received from backend:', properties); // Log the actual data
-        displayMap([properties]); // Make sure to wrap it in an array if needed
-        displayRecommendations([properties]); // Make sure to wrap it in an array if needed
+    .catch(error => console.error('Error fetching properties:', error));
+}
+
+// Send a request to the backend to fetch the livability scores
+function fetchLivabilityScores(neighbourhood) {
+    fetch('/get-livability', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ neighbourhood: neighbourhood })
     })
-    .catch(error => console.error('Error fetching properties:', error)); // Log any errors    
+    .then(response => response.json())
+    .then(data => {
+        console.log('Livability scores:', data);
+    })
+    .catch(error => console.error('Error fetching livability scores:', error));
 }
