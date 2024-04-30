@@ -3,6 +3,7 @@ node_modules/
 
 # Environment file
 .env
+config.py
 
 # Build directory
 settings.json
