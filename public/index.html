@@ -197,6 +197,8 @@
                 card.classList.add('property-card');
                 card.dataset.propertyId = index.toString(); // Properly set data attributes
                 
+                // Construct the Google search URL
+                const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(property.link + ' ' + property.name)}`;
                 // Didn't manage to get the flip card to work, so moved all the info to the front
                 card.innerHTML = `
                     <div class="flip-card-inner">
@@ -219,7 +221,7 @@
                                 <p>User Ratings: ${property.livability.user_ratings}</p>
                             </div>
                             <div class="property-actions">
-                                <a href="${property.link}" target="_blank" class="view-listing-btn">View Listing</a>
+                                <a href="${googleSearchUrl}" target="_blank" class="view-listing-btn">Property Link</a>
                             </div>
                         </div>
                     </div>

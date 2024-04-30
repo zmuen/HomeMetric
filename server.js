@@ -35,11 +35,11 @@ app.post('/api/recommendations', async (req, res) => {
 
         // Construct the request to OpenAI API including a system message and a user message
         const requestBody = {
-            model: 'gpt-3.5-turbo',
+            model: 'gpt-4-turbo',
             messages: [
                 {
                     role: 'system',
-                    content: 'Task: Generate a detailed list of 4 properties from Airbnb, Zumper or other rental platforms in valid JSON array format based on the user preferences. Return the information in the following JSON format: {"name": "Name of the property", "description": "Description of the property", "neighborhood": "Neighborhood, city, state, zip code", "location": [longitude, latitude], "price": "Price of the property", "link": "url to the property listing"}'
+                    content: 'Task: Generate a realistic and actionable list of 5 properties from rental platforms in valid JSON array format based on the user preferences. The data should not be synthetic. Return the information in the following JSON format: {"name": "Name of the property", "description": "Description of the property", "neighborhood": "Neighborhood, city, two-letter state abbreviations, zip code", "location": [longitude, latitude], "price": "Price of the property", "link": "url to the property listing"}'
                 },
                 {
                     role: 'user',

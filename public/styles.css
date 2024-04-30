@@ -84,7 +84,7 @@ button:hover {
 /* Footer CSS */
 footer {
     position: absolute;
-    bottom: 0;
+    bottom: 20px;
     width: 30%; /* Match the width of the container */
 }
 
@@ -132,7 +132,7 @@ footer a:hover {
 }
 
 .flip-card-back {
-    background-color: #2980b9;
+    background-color: #4682B4;
     color: white;
     transform: rotateY(180deg);
     z-index: 1; /* Lower z-index so it's below the front side */
