@@ -4,7 +4,7 @@ Rental Recommendation and Livability Calculator
  ## YouTube Video https://youtu.be/oHKou246_rQ
  Here is a short video describing the process of using this application:
 
- ## Updata 11.2024
+ ## Update 11.2024
  The livability-analysis.ipynb provides you an example on how you can utilize the livability data from the Livability.db to gain insights about the living environment you want to study.
  
  ## Objective: 
