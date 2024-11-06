@@ -21,3 +21,6 @@ You will need to get Keys for OPEANAI_API_KEY and Perplexity AI and put them in 
 
  ## Typical Run
  A typical run first run the server with "node server.js". This should popup a browser window on port 5500.
+
+## Here is how it looks
+![Plotly Figure](UI.png)
